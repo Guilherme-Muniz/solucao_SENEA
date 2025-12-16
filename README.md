@@ -1,6 +1,7 @@
 # Projeto de Integração SENEA - Ti Saúde
 
 > **Disciplina:** Integração e Evolução de Sistemas da Informação  
+
 > **Alunos:** Guilherme Muniz (gmm9), João Lucas Tavares (jltf), Luiz gouveia (lfcg), Sofia Remides (srpo), Julia Andrade (jalgb), Jean Lucas (jlbd)
 
 > **Instituição:** Centro de Informática (CIn) - UFPE  
