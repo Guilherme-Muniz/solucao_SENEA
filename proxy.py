@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory, Response
 import requests
 import os
+from datetime import date
 
 # === CONFIGURAÇÕES ===
 app = Flask(__name__, static_folder='.')
@@ -14,6 +15,83 @@ SEU_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FwaS50aX
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
+
+# 1.1 Rota para entregar o perfil etário agregado
+@app.route('/api/stats/age-profile', methods=['GET'])
+def age_profile():
+    hoje = date.today()
+    youth = adult = senior = unknown = 0
+
+    headers = {
+        'Authorization': f'Bearer {SEU_TOKEN}',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0'
+    }
+
+    # 1️⃣ Busca primeira página
+    url = f"{TARGET_URL}/api/patients"
+    resp = requests.get(url, headers=headers)
+
+    if not resp.ok:
+        return jsonify({"error": "Erro ao buscar pacientes"}), 500
+
+    data = resp.json()
+    pacientes = data.get('data', [])
+    last_page = data.get('last_page', 1)
+
+    def processar_lista(lista):
+        nonlocal youth, adult, senior, unknown
+        for p in lista:
+            nascimento = p.get('dateOfBirth')
+
+            # Alguns registros têm CPF no lugar da data → ignora
+            if nascimento and '/' in nascimento:
+                try:
+                    dia, mes, ano = nascimento.split('/')
+                    nasc = date(int(ano), int(mes), int(dia))
+                    idade = hoje.year - nasc.year - (
+                        (hoje.month, hoje.day) < (nasc.month, nasc.day)
+                    )
+
+                    if idade < 20:
+                        youth += 1
+                    elif idade < 60:
+                        adult += 1
+                    else:
+                        senior += 1
+                except Exception:
+                    unknown += 1
+            else:
+                unknown += 1
+
+    # Processa página 1
+    processar_lista(pacientes)
+
+    # 2️⃣ Busca as demais páginas
+    for page in range(2, last_page + 1):
+        resp = requests.get(
+            url,
+            headers=headers,
+            params={"page": page}
+        )
+
+        if not resp.ok:
+            break
+
+        data = resp.json()
+        pacientes = data.get('data', [])
+        processar_lista(pacientes)
+
+    total = youth + adult + senior + unknown
+
+    return jsonify({
+        "youth": youth,
+        "adult": adult,
+        "senior": senior,
+        "unknown": unknown,
+        "total": total
+    })
+
 
 # 2. Rota para entregar arquivos estáticos (CSS, JS, Imagens)
 @app.route('/<path:filename>')

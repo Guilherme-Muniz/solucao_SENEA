@@ -5,6 +5,7 @@ const BASE_URL = '';
 const API_SEARCH = `${BASE_URL}/api/patients?search=`;
 const API_DETAILS = `${BASE_URL}/api/patients/`; // Nova rota para detalhes
 const API_CREATE = `${BASE_URL}/api/patients/create`;
+const API_AGE_PROFILE = `${BASE_URL}/api/stats/age-profile`;
 
 // Configuração do Local Storage
 const STORAGE_KEY = 'senea_recentes';
@@ -12,7 +13,9 @@ let cacheLocal = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
 document.addEventListener('DOMContentLoaded', () => {
     atualizarDashboard();
+    carregarPerfilEtario();
 });
+
 
 // ============================================================
 // FUNÇÕES AUXILIARES (FORMATAÇÃO)
@@ -358,4 +361,29 @@ function calcIMC() {
 if (pesoInput && alturaInput) {
     pesoInput.addEventListener('input', calcIMC);
     alturaInput.addEventListener('input', calcIMC);
+}
+
+// ============================================================
+// CARREGAR PERFIL ETÁRIO (NOVA FUNÇÃO)
+// ============================================================
+async function carregarPerfilEtario() {
+    try {
+        const res = await fetch(API_AGE_PROFILE);
+        if (!res.ok) return;
+
+        const d = await res.json();
+
+        const { youth, adult, senior, unknown, total } = d;
+
+        document.getElementById('countYouth').innerText = youth;
+        document.getElementById('countAdult').innerText = adult;
+        document.getElementById('countSenior').innerText = senior;
+
+        document.getElementById('barYouth').style.width   = `${(youth / total) * 100}%`;
+        document.getElementById('barAdult').style.width   = `${(adult / total) * 100}%`;
+        document.getElementById('barSenior').style.width  = `${(senior / total) * 100}%`;
+        document.getElementById('barUnknown').style.width = `${(unknown / total) * 100}%`;
+    } catch (e) {
+        console.error('Erro ao carregar perfil etário', e);
+    }
 }
