@@ -1,95 +1,218 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENEA - Integração Ti Saúde</title>
-    <link rel="stylesheet" href="style.css">
+    <title>SENEA | Prontuário Digital</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="assets/css/style.css?v=4.0">
 </head>
+
 <body>
 
-    <div class="container">
-        <header>
-            <h1>SENEA | Novo Atendimento</h1>
-            <p>Sistema Integrado ao Ti Saúde</p>
+    <div class="main-wrapper">
+        <header class="app-header">
+            <div class="logo-area">
+                <i class="fa-solid fa-heart-pulse logo-icon"></i>
+                <div>
+                    <h1>SENEA</h1>
+                    <p>Prontuário Integrado &bull; Ti Saúde</p>
+                </div>
+            </div>
         </header>
 
-        <section class="card search-section">
-            <h2>1. Buscar Paciente na Base</h2>
-            <div class="row">
-                <div class="input-group">
-                    <input type="text" id="buscaNome" placeholder="Digite o nome completo...">
+        <main class="container">
+            <div class="dashboard-grid">
+
+                <div class="left-content">
+
+                    <section class="card search-card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <h2>Buscar Paciente</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="search-grid">
+                                <div class="input-wrapper">
+                                    <i class="fa-regular fa-address-card input-icon"></i>
+                                    <input type="text" id="buscaCpf" placeholder="CPF (apenas números)" maxlength="14"
+                                        oninput="mascaraCPF(this)">
+                                </div>
+                                <div class="input-wrapper" style="flex: 2;">
+                                    <i class="fa-regular fa-user input-icon"></i>
+                                    <input type="text" id="buscaNome" placeholder="Ou digite o nome completo...">
+                                </div>
+                                <button type="button" onclick="buscarPaciente()" class="btn btn-search btn-round"
+                                    title="Pesquisar">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                            <div id="resultadoBusca" class="feedback-container"></div>
+                        </div>
+                    </section>
+
+                    <form id="prontuarioForm">
+                        <section class="card fade-in">
+                            <div class="card-header">
+                                <i class="fa-regular fa-id-card"></i>
+                                <h2>Dados Pessoais</h2>
+                            </div>
+                            <div class="card-body grid-layout">
+                                <div class="input-group">
+                                    <label>CPF</label>
+                                    <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14"
+                                        oninput="mascaraCPF(this)">
+                                </div>
+                                <div class="input-group">
+                                    <label>Nome Completo <span class="required">*</span></label>
+                                    <input type="text" id="name" required placeholder="Nome do paciente">
+                                </div>
+                                <div class="input-group">
+                                    <label>Nascimento <span id="displayIdade"
+                                            style="font-weight:normal; font-size: 0.85rem; margin-left:5px;"></span></label>
+                                    <input type="date" id="birthdate" onchange="calcularIdadeFormulario()">
+                                </div>
+                                <div class="input-group">
+                                    <label>Nome da Mãe</label>
+                                    <input type="text" id="mother" placeholder="Nome da mãe">
+                                </div>
+                                <div class="input-group">
+                                    <label>Sexo Biológico</label>
+                                    <div class="select-wrapper">
+                                        <select id="sex">
+                                            <option value="">Selecione...</option>
+                                            <option value="Male">Masculino</option>
+                                            <option value="Female">Feminino</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Email</label>
+                                    <input type="email" id="email" placeholder="exemplo@email.com">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Celular</label>
+                                    <input type="text" id="cellphone" placeholder="(81) 90000-0000">
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="card fade-in">
+                            <div class="card-header">
+                                <i class="fa-solid fa-stethoscope"></i>
+                                <h2>Dados Clínicos</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="grid-layout three-cols">
+                                    <div class="input-group">
+                                        <label>Peso (kg)</label>
+                                        <input type="number" step="0.01" id="peso" placeholder="00.0">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Altura (m)</label>
+                                        <input type="number" step="0.01" id="altura" placeholder="1.00">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>IMC</label>
+                                        <input type="text" id="imc" readonly class="readonly-field" placeholder="-">
+                                    </div>
+                                </div>
+                                <div class="input-group mt-4">
+                                    <label>Anamnese / Queixas</label>
+                                    <textarea id="historico" rows="4"
+                                        placeholder="Descreva o histórico clínico..."></textarea>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="actions">
+                            <div id="formFeedback" style="margin-bottom: 15px;"></div>
+                            <button type="submit" class="btn btn-primary btn-save">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                Salvar e Integrar
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <button type="button" onclick="buscarPaciente()" class="btn-search">Pesquisar</button>
+
+                <aside class="right-sidebar">
+
+                    <div class="stat-card status-card">
+                        <div class="stat-icon pulse-icon" style="background: #dcfce7; color: #10b981;">
+                            <i class="fa-solid fa-wifi"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Status API</h3>
+                            <p id="apiStatus" style="font-size: 1.2rem; color: #10b981;">Online</p>
+                            <small id="apiPing" style="color: #64748b; font-size: 0.8rem;">Conectado</small>
+                        </div>
+                    </div>
+
+                    <div class="stat-card total-card">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total na Base</h3>
+                            <p id="dashTotal">...</p>
+                        </div>
+                    </div>
+
+                    <div class="card demographic-card">
+                        <div class="card-header small-header">
+                            <i class="fa-solid fa-chart-column"></i>
+                            <h2>Perfil Etário da Base</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="gender-chart">
+                                <div class="gender-labels">
+                                    <span title="Jovens (0-19)" style="color: #10b981;">
+                                        <i class="fa-solid fa-child"></i> <span id="countYouth">0</span>
+                                    </span>
+                                    <span title="Adultos (20-59)" style="color: #3b82f6;">
+                                        <i class="fa-solid fa-user"></i> <span id="countAdult">0</span>
+                                    </span>
+                                    <span title="Idosos (60+)" style="color: #f59e0b;">
+                                        <i class="fa-solid fa-person-cane"></i> <span id="countSenior">0</span>
+                                    </span>
+                                </div>
+
+                                <div class="progress-bar-bg">
+                                    <div id="barYouth" class="youth-fill" style="width: 0%;"></div>
+                                    <div id="barAdult" class="adult-fill" style="width: 0%;"></div>
+                                    <div id="barSenior" class="senior-fill" style="width: 0%;"></div>
+                                    <div id="barUnknown" class="unknown-fill" style="width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card recent-list-card">
+                        <div class="card-header small-header">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            <h2>Últimos Cadastrados</h2>
+                        </div>
+                        <div class="card-body" style="padding: 0;">
+                            <ul id="listaRecentes" class="recent-list">
+                                <li class="empty-msg">Nenhum cadastro recente.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </aside>
             </div>
-            <div id="resultadoBusca" class="feedback-msg"></div>
-        </section>
+        </main>
 
-        <form id="prontuarioForm">
-            <section class="card">
-                <h2>2. Dados do Paciente</h2>
-                <div class="row">
-                    <div class="input-group">
-                        <label>Nome Completo *</label>
-                        <input type="text" id="name" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Data de Nascimento</label>
-                        <input type="date" id="birthdate">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-group">
-                        <label>Nome da Mãe</label>
-                        <input type="text" id="mother">
-                    </div>
-                    <div class="input-group">
-                        <label>Sexo</label>
-                        <select id="sex">
-                            <option value="">Selecione...</option>
-                            <option value="Male">Masculino</option>
-                            <option value="Female">Feminino</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-group">
-                        <label>Email</label>
-                        <input type="email" id="email">
-                    </div>
-                    <div class="input-group">
-                        <label>Celular</label>
-                        <input type="text" id="cellphone" placeholder="(81) 9...">
-                    </div>
-                </div>
-            </section>
-
-            <section class="card">
-                <h2>3. Dados Clínicos (Consulta Atual)</h2>
-                <div class="row">
-                    <div class="input-group">
-                        <label>Peso (kg)</label>
-                        <input type="number" step="0.01" id="peso">
-                    </div>
-                    <div class="input-group">
-                        <label>Altura (m)</label>
-                        <input type="number" step="0.01" id="altura">
-                    </div>
-                    <div class="input-group">
-                        <label>IMC (Automático)</label>
-                        <input type="text" id="imc" readonly style="background: #e9ecef;">
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>Histórico / Queixas Principais</label>
-                    <textarea id="historico" rows="4" placeholder="Descreva o motivo da consulta..."></textarea>
-                </div>
-            </section>
-
-            <button type="submit" class="btn-save">Salvar e Integrar</button>
-        </form>
+        <footer class="app-footer">
+            <p>&copy; 2025 SENEA - Clínica Escola de Nutrição</p>
+        </footer>
     </div>
 
-    <script src="app.js"></script>
+    <script src="assets/js/app.js"></script>
 </body>
+
 </html>
