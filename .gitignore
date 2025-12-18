@@ -1,0 +1,21 @@
+# Ambiente Virtual (NUNCA envie isso)
+venv/
+env/
+.env
+
+# Python (Cache e compilados)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Configurações de IDEs (VS Code, Pycharm)
+.vscode/
+.idea/
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

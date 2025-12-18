@@ -1,89 +1,118 @@
-# Projeto de Integração SENEA - Ti Saúde
+# 🏥 Solução SENEA - Prontuário Digital Integrado
 
-> **Disciplina:** Integração e Evolução de Sistemas da Informação  
+> Sistema de gestão de pacientes e prontuário eletrônico desenvolvido para a Clínica Escola de Nutrição (SENEA), com integração via API à plataforma Ti Saúde.
 
-> **Alunos:** Guilherme Muniz (gmm9), João Lucas Tavares (jltf), Luiz gouveia (lfcg), Sofia Remides (srpo), Julia Andrade (jalgb), Jean Lucas (jlbd)
+![Badge Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-yellow) ![Badge Tech](https://img.shields.io/badge/Tech-HTML_|_CSS_|_JS_|_Python-blue)
 
-> **Instituição:** Centro de Informática (CIn) - UFPE  
+## 📋 Sobre o Projeto
 
-## 📌 Visão Geral
+Este projeto visa otimizar o fluxo de atendimento na clínica escola, permitindo a busca, visualização e cadastro de pacientes de forma ágil. O sistema atua como uma interface moderna e responsiva, resolvendo problemas de inconsistência de dados (datas, gênero, formatação) vindos da base legada e oferecendo dashboards em tempo real.
 
-Este projeto visa modernizar o fluxo de atendimento da **Clínica Escola de Nutrição (SENEA)**. Atualmente, a gestão de pacientes é feita através de planilhas Excel desconexas, gerando duplicidade de dados e riscos de perda de informação.
+### ✨ Principais Funcionalidades
 
-A solução desenvolvida é um **Front-end de Prontuário Eletrônico** que se comunica diretamente com a API oficial do sistema **Ti Saúde**, garantindo:
-1.  **Fim da Duplicidade:** Busca na base oficial antes de cadastrar.
-2.  **Segurança de Dados:** Armazenamento em nuvem (API) em vez de arquivos locais.
-3.  **Agilidade:** Preenchimento automático de dados cadastrais.
+* **Busca Inteligente (Deep Search):**
+    * Realiza varredura na API por Nome ou CPF.
+    * Busca automática da **ficha detalhada** (Endpoint `/patients/{id}`) para preencher dados sensíveis como Nome da Mãe, Histórico e Dados Clínicos.
+* **Dashboard em Tempo Real:**
+    * **Status da API:** Monitoramento de conectividade.
+    * **Total na Base:** Contagem dinâmica de pacientes.
+    * **Perfil Etário:** Gráfico automático que categoriza a base em Jovens, Adultos e Idosos.
+* **Persistência de Sessão (Local Storage):**
+    * Mantém a lista dos **5 últimos pacientes** visível mesmo após recarregar a página (F5).
+* **Sanitização de Dados:**
+    * Correção automática de datas (BR/ISO), Gênero e Máscaras de CPF.
+    * Varredura profunda de objetos JSON.
 
-## 🛠️ Arquitetura da Solução
+---
 
-Para viabilizar a integração entre o ambiente local (desenvolvimento) e a API de produção do Ti Saúde, foi implementada uma arquitetura com **Middleware (Proxy)**.
+## 🛠️ Tecnologias Utilizadas
 
-### O Desafio Técnico (CORS & Autenticação)
-Os navegadores bloqueiam requisições diretas de `localhost` para APIs externas (`api.tisaude.com`) devido à política de segurança **CORS**. Além disso, a API exige um **Bearer Token** em todas as chamadas.
+### Frontend
+* **HTML5 & CSS3:** Layout responsivo e organizado.
+* **JavaScript (Vanilla):** Lógica de negócios, `fetch` API e manipulação de DOM.
 
-### A Solução (Python Proxy)
-Foi desenvolvido um servidor intermediário em **Python** (`proxy.py`) que atua como um *Gateway*:
-1.  O Front-end solicita dados ao `localhost:8081`.
-2.  O Python intercepta, injeta o **Token de Segurança** e repassa a requisição ao Ti Saúde.
-3.  O Python recebe a resposta e devolve ao Front-end adicionando os cabeçalhos de permissão CORS (`Access-Control-Allow-Origin`).
+### Backend / Ferramentas
+* **Python 3.x:** Proxy de requisições e scripts auxiliares.
+* **Virtualenv:** Gerenciamento de ambiente isolado.
+* **Git:** Versionamento de código.
 
-```mermaid
-Front-end (JS)  <-->  Proxy Local (Python)  <-->  API Ti Saúde (Nuvem)
-   [Porta 8081]       [Injeta Token/CORS]          [Banco de Dados]
+---
+
+## 📂 Estrutura do Projeto
+
+```text
+SOLUCAO_SENEA/
+│
+├── assets/                 # Recursos estáticos
+│   ├── css/
+│   │   └── style.css       # Estilos
+│   └── js/
+│       └── app.js          # Lógica Principal
+│
+├── venv/                   # Ambiente Virtual (ignorado pelo git)
+├── index.html              # Ponto de entrada
+├── proxy.py                # Servidor/Script Python
+├── requirements.txt        # Dependências
+└── README.md               # Documentação
 ```
 
+---
 
-### 🚀 Funcionalidades
+## 🚀 Como Rodar o Projeto
 
-    Busca Inteligente (GET): Permite pesquisar pacientes por nome na base do Ti Saúde.
+Siga os passos abaixo para configurar e executar o ambiente localmente.
 
-    Auto-Preenchimento: Se o paciente existe, o formulário é populado automaticamente.
+### 1. Pré-requisitos
+Certifique-se de ter instalado:
+* **Python 3.8** ou superior.
+* **Git**.
 
-    Cadastro de Pacientes (POST): Envia novos pacientes diretamente para o banco de dados do sistema legado.
+### 2. Instalação
 
-    Cálculo de IMC: Lógica client-side para feedback imediato do estado nutricional.
+Clone o repositório e entre na pasta:
+```bash
+git clone https://github.com/seu-usuario/solucao-senea.git
+cd SOLUCAO_SENEA
+```
 
-### 📂 Estrutura de Arquivos
+Crie o ambiente virtual (Recomendado):
+```bash
+# Windows
+python -m venv venv
+.\venv\Scripts\activate
 
-    index.html: Interface do usuário (Formulários de Identificação e Antropometria).
+# Linux/Mac
+python3 -m venv venv
+source venv/bin/activate
+```
 
-    style.css: Estilização seguindo a identidade visual clínica (Clean UI).
+Instale as dependências:
+```bash
+pip install -r requirements.txt
+```
 
-    app.js: Lógica de controle, validação de formulário e comunicação assíncrona (fetch).
+### 3. Executando a Aplicação
 
-    proxy.py: Servidor de aplicação Python responsável pela autenticação e tunelamento HTTP.
+Para rodar o projeto utilizando o script Python (recomendado para evitar problemas de CORS e caminhos):
 
-## 🔧 Como Rodar o Projeto
-Pré-requisitos
+```bash
+python proxy.py
+```
 
-    Python 3.x instalado.
+Após rodar o comando, o terminal exibirá um endereço local (geralmente `http://127.0.0.1:5000` ou similar). Abra esse link no seu navegador.
 
-    Navegador Web (Chrome/Firefox).
+---
 
-Passo a Passo
+## 🧠 Detalhes Técnicos
 
-    Clone ou baixe este repositório.
+### Normalização de Dados
+O sistema utiliza um **Adapter Pattern** no `app.js` (`normalizarPaciente`) para padronizar os dados vindos da API externa, que frequentemente variam de estrutura (objetos aninhados em `client` ou `data`).
 
-    Abra o terminal na pasta do projeto.
+### Estratégia de Cache
+Para performance e UX, o sistema utiliza `localStorage` do navegador para persistir o histórico recente de atendimentos, evitando consultas repetitivas à API para pacientes recém-acessados.
 
-    Execute o servidor Proxy:
-    Bash
+---
 
-    python3 proxy.py
+## 📝 Licença
 
-    Aguarde a mensagem: "🚀 SERVIDOR PRONTO! Acesse: http://localhost:8081"
-
-    Abra seu navegador e acesse:
-
-        http://localhost:8081
-
-    Teste a Integração:
-
-        Digite um nome na busca e clique em "Pesquisar".
-
-        Verifique no terminal os logs de sucesso (✅ SUCESSO! Ti Saúde respondeu: 200).
-
-## 🔐 Configuração de Token
-
-O token de acesso está configurado diretamente no arquivo proxy.py na variável SEU_TOKEN.
+Este projeto foi desenvolvido para fins acadêmicos e profissionais vinculados à SENEA.
